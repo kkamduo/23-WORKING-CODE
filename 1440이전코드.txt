@@ -1,0 +1,53 @@
+#include <CytronWiFiClient.h>
+#include <CytronWiFiServer.h>
+#include <CytronWiFiShield.h>
+#include <WiFiClient.h>
+#include <SoftwareSerial.h>
+#include <stdio.h>
+
+/*
+ * 0426 소켓 통신 구현중
+ */
+const char *ssid = "HYDROBOT_2.4G";
+const char *pass = "hydrobot!!";
+
+WiFiUDP Udp;
+String remote_ip[] = "192.168.137.1";
+int remote_port = 9999;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+  wifi_conn();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  char message[] = "hihi";
+  Udp.beginPacket(remote_ip, remote_port);
+  Udp.write(message);
+  Udp.endPacket();
+
+  delay(1000);
+}
+
+void wifi_conn() {
+  if(!wifi.begin(12, 13))
+  {
+    Serial.println(F("Error talking to shield"));
+    while(1);
+  }
+
+  Serial.println(F("Start wifi connection"));
+  if(!wifi.connectAP(ssid, pass))
+  {
+    Serial.println(F("Error connecting to WiFi"));
+    while(1);
+  } 
+  Serial.print(F("Connected to "));Serial.println(wifi.SSID());
+  Serial.println(F("IP address: "));
+  Serial.println(wifi.localIP());
+  wifi.updateStatus();
+  Serial.println(wifi.status()); //2- wifi connected with ip, 3- got connection with servers or clients, 4- disconnect with clients or servers, 5- no wifi
+}
